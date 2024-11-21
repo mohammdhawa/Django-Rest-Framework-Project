@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Packages
+    'rest_framework',
+
     # Apps
     'watchlist_app.apps.WatchlistAppConfig'
 ]
