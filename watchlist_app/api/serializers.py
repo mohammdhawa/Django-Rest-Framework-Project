@@ -45,6 +45,31 @@ class MovieSerializer(serializers.Serializer):
 
         return instance
 
+    def validate(self, data):
+        """
+        Perform custom validation for the entire Movie instance data.
+
+        This method ensures that the provided data satisfies additional
+        constraints that involve multiple fields. Specifically, it checks
+        that the 'name' and 'description' fields are not identical, as this
+        would not make sense for a valid Movie object. If this condition
+        is violated, a ValidationError is raised.
+
+        Args:
+            data (dict): The full set of data being validated for the Movie instance.
+
+        Returns:
+            dict: The validated data if all conditions are met.
+
+        Raises:
+            serializers.ValidationError: If 'name' and 'description' fields
+                                         have the same value.
+        """
+        if data['name'] == data['description']:
+            raise serializers.ValidationError("Name and description cannot be the same.")
+        else:
+            return data
+  
     def validate_name(self, value):
         """
         Validate the 'name' field of the Movie instance.
