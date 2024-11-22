@@ -44,3 +44,27 @@ class MovieSerializer(serializers.Serializer):
         instance.save()
 
         return instance
+
+    def validate_name(self, value):
+        """
+        Validate the 'name' field of the Movie instance.
+
+        This method ensures that the 'name' field meets the required
+        criteria before the data is processed further. Specifically,
+        it checks that the name has a minimum length of 2 characters.
+        If the validation fails, a ValidationError is raised.
+
+        Args:
+            value (str): The value of the 'name' field provided for validation.
+
+        Returns:
+            str: The validated 'name' value if it meets the criteria.
+
+        Raises:
+            serializers.ValidationError: If the 'name' is less than 2 characters long.
+        """
+        if len(value) < 2:
+            raise serializers.ValidationError("Name must be at least 2 characters.")
+        else:
+            return value
+
