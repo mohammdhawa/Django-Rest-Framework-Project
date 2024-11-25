@@ -159,7 +159,7 @@ class WatchListDetailAPI(APIView):
 class StreamPlatformAPI(APIView):
     def get(self, request):
         streamplatform = StreamPlatform.objects.all()
-        serializer = StreamPlatformSerializer(streamplatform, many=True)
+        serializer = StreamPlatformSerializer(streamplatform, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
