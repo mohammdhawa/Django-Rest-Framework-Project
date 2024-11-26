@@ -1,12 +1,13 @@
 from django.urls import path
 # from .views import movie_list_api, movie_detail_api
 from .views import (WatchListAPI, WatchListDetailAPI, StreamPlatformAPI, StreamPlatformDetailAPI,
-                    ReviewListAPI, ReviewDetailAPI)
+                    ReviewListAPI, ReviewDetailAPI, ReviewCreateAPI)
 
 
 urlpatterns = [
     path('watchlist', WatchListAPI.as_view(), name='watchlist'),
     path('watchlist/<int:pk>', WatchListDetailAPI.as_view(), name='watchlist-detail'),
+    path('watchlist/<int:pk>/review-create', ReviewCreateAPI.as_view(), name='review-create'),
     path('watchlist/<int:pk>/review', ReviewListAPI.as_view(), name='review-list'),
     path('watchlist/review/<int:pk>', ReviewDetailAPI.as_view(), name='review-detail'),
     path('platform', StreamPlatformAPI.as_view(), name='streamplatform-list'),
