@@ -2,6 +2,7 @@ from urllib import request
 
 from django.core.serializers import serialize
 from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
@@ -42,13 +43,20 @@ class PlatFormVS(viewsets.ModelViewSet):
 
 
 class ReviewCreateAPI(generics.CreateAPIView):
-    # queryset = Review.objects.all()
+    queryset = Review.objects.all()
     serializer_class = ReviewSerializer
 
     def perform_create(self, serializer):
         pk = self.kwargs['pk']
         movie = WatchList.objects.get(id=pk)
-        serializer.save(watchlist=movie)
+
+        user = self.request.user
+        review_queryset = Review.objects.filter(review_user=user, watchlist=movie)
+
+        if review_queryset.exists():
+            raise ValidationError("You have already reviewed this movie")
+
+        serializer.save(watchlist=movie, review_user=user)
 
 
 class ReviewListAPI(generics.ListCreateAPIView):
