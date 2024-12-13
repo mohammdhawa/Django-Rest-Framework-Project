@@ -1,7 +1,13 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+
 # from .views import movie_list_api, movie_detail_api
 from .views import (WatchListAPI, WatchListDetailAPI, StreamPlatformAPI, StreamPlatformDetailAPI,
-                    ReviewListAPI, ReviewDetailAPI, ReviewCreateAPI)
+                    ReviewListAPI, ReviewDetailAPI, ReviewCreateAPI, PlatFormVS)
+
+
+router = DefaultRouter()
+router.register(r'platforms', PlatFormVS, basename='platforms')
 
 
 urlpatterns = [
@@ -15,4 +21,5 @@ urlpatterns = [
 
     # path('list', movie_list_api, name='movie-list'),
     # path('<int:pk>', movie_detail_api, name='movie-detail'),
+    path('', include(router.urls)),
 ]
