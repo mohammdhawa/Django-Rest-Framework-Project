@@ -7,8 +7,10 @@ class AdminOrReadOnly(permissions.IsAdminUser):
     """
 
     def has_permission(self, request, view):
-        admin_permissions = bool(request.user and request.user.is_staff)
-        return request.method == 'GET' or admin_permissions
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        else:
+            return bool(request.user and request.user.is_staff)
 
 
 # Define a custom permission class to handle review-specific permissions
