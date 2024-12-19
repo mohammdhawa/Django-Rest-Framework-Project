@@ -40,7 +40,8 @@ from watchlist_app.api.permissions import AdminOrReadOnly, ReviewUserOrReadOnly
 class PlatFormVS(viewsets.ModelViewSet):
     queryset = StreamPlatform.objects.all()
     serializer_class = StreamPlatformSerializer
-    permission_classes = [AdminOrReadOnly]
+    # permission_classes = [AdminOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
 
 class ReviewCreateAPI(generics.CreateAPIView):
@@ -56,6 +57,14 @@ class ReviewCreateAPI(generics.CreateAPIView):
 
         if review_queryset.exists():
             raise ValidationError("You have already reviewed this movie")
+
+        if movie.number_rating == 0:
+            movie.avg_rating = serializer.validated_data['rating']
+        else:
+            movie.avg_rating = (movie.avg_rating + serializer.validated_data['rating']) / 2
+
+        movie.number_rating = movie.number_rating + 1
+        movie.save()
 
         serializer.save(watchlist=movie, review_user=user)
 
