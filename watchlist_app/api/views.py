@@ -40,8 +40,7 @@ from watchlist_app.api.permissions import AdminOrReadOnly, ReviewUserOrReadOnly
 class PlatFormVS(viewsets.ModelViewSet):
     queryset = StreamPlatform.objects.all()
     serializer_class = StreamPlatformSerializer
-    # permission_classes = [AdminOrReadOnly]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AdminOrReadOnly]
 
 
 class ReviewCreateAPI(generics.CreateAPIView):
