@@ -33,9 +33,16 @@ class RegistrationAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST', ])
-def logout_view(request):
+# @api_view(['POST', ])
+# def logout_view(request):
+#
+#     if request.method == 'POST':
+#         request.user.auth_token.delete()
+#         return Response(status=status.HTTP_200_OK)
 
-    if request.method == 'POST':
+
+class LogoutAPIView(APIView):
+
+    def post(self, request, *args, **kwargs):
         request.user.auth_token.delete()
-        return Response(status=status.HTTP_200_OK)
+        return Response({'message': 'Logged out successfully!'}, status=status.HTTP_200_OK)
