@@ -42,4 +42,4 @@ class ReviewUserOrReadOnly(permissions.BasePermission):
         else:
             # For non-safe methods (e.g., POST, PUT, DELETE),
             # grant permission only if the requesting user is the owner of the review.
-            return obj.review_user == request.user
+            return obj.review_user == request.user or request.user.is_superuser
