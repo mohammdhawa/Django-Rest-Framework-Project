@@ -107,6 +107,8 @@ class ReviewDetailAPI(generics.RetrieveUpdateDestroyAPIView):
 
 
 class WatchListAPI(APIView):
+    permission_classes = [AdminOrReadOnly]
+
     def get(self, request, format=None):
         """
         Handles GET requests for the MovieListAPI.
@@ -163,6 +165,8 @@ class WatchListAPI(APIView):
 
 
 class WatchListDetailAPI(APIView):
+    permission_classes = [AdminOrReadOnly]
+
     def get(self, request, pk):
         """
         Handles GET requests to retrieve details of a specific movie.

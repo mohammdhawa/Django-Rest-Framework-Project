@@ -12,7 +12,7 @@ router.register(r'platforms', PlatFormVS, basename='platforms')
 
 urlpatterns = [
     path('watchlist', WatchListAPI.as_view(), name='watchlist'),
-    path('watchlist/<int:pk>', WatchListDetailAPI.as_view(), name='watchlist-detail'),
+    path('watchlist/<int:pk>/', WatchListDetailAPI.as_view(), name='watchlist-detail'),
     path('watchlist/<int:pk>/review-create', ReviewCreateAPI.as_view(), name='review-create'),
     path('watchlist/<int:pk>/review', ReviewListAPI.as_view(), name='review-list'),
     path('watchlist/review/<int:pk>', ReviewDetailAPI.as_view(), name='review-detail'),
