@@ -150,3 +150,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication', # For JWT Token
     ]
 }
+
+SIMPLE_JWT = {
+    'ROTATE_REFRESH_TOKENS': True
+}
