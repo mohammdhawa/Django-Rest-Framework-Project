@@ -334,6 +334,6 @@ class WatchListTest(generics.ListAPIView):
     queryset = WatchList.objects.all()
     serializer_class = WatchListSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['title', 'active']
-    search_fields = ['title', 'storyline']
+    filterset_fields = ['active']
+    search_fields = ['title', 'storyline', 'platform__name']
 
