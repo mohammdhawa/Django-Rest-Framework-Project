@@ -333,7 +333,8 @@ class StreamPlatformDetailAPI(APIView):
 class WatchListTest(generics.ListAPIView):
     queryset = WatchList.objects.all()
     serializer_class = WatchListSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['active']
     search_fields = ['title', 'storyline', 'platform__name']
+    ordering_fields = ['avg_rating', 'number_rating']
 
