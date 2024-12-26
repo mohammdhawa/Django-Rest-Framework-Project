@@ -143,6 +143,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Rest Framework
 REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     # 'DEFAULT_PERMISSION_CLASSES': [
     #     'rest_framework.permissions.IsAuthenticated',
     # ],
@@ -160,8 +161,8 @@ REST_FRAMEWORK = {
         'user': '5/day',
         'review-create': '1/day',
         'review-list': '10/day',
-        'review-detail': '2/day',
-    }
+        'review-detail': '10/day',
+    },
 }
 
 SIMPLE_JWT = {

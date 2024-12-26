@@ -19,6 +19,9 @@ from watchlist_app.api.permissions import AdminOrReadOnly, ReviewUserOrReadOnly
 from watchlist_app.api.throttling import ReviewCreateThrottle, ReviewListThrottle
 from rest_framework.throttling import ScopedRateThrottle
 
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+
 
 # class PlatFormVS(viewsets.ViewSet):
 #     def list(self, request):
@@ -44,9 +47,14 @@ from rest_framework.throttling import ScopedRateThrottle
 class UserReviewAPI(generics.ListCreateAPIView):
     serializer_class = ReviewSerializer
 
+    # def get_queryset(self):
+    #     username = self.kwargs['username']
+    #     return Review.objects.filter(review_user__username=username)
+
     def get_queryset(self):
-        username = self.kwargs['username']
+        username = self.request.query_params.get('username')
         return Review.objects.filter(review_user__username=username)
+
 
 
 class PlatFormVS(viewsets.ModelViewSet):
@@ -89,6 +97,8 @@ class ReviewListAPI(generics.ListCreateAPIView):
     # throttle_classes = [ReviewListThrottle]
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = 'review-detail'
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['review_user__username', 'active']
 
     def get_queryset(self, *args, **kwargs):
         queryset = super().get_queryset()
@@ -318,3 +328,12 @@ class StreamPlatformDetailAPI(APIView):
 
         streamplatform.delete()
         return Response({'Message': 'StreamPlatform deleted successfully'}, status=status.HTTP_200_OK)
+
+
+class WatchListTest(generics.ListAPIView):
+    queryset = WatchList.objects.all()
+    serializer_class = WatchListSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filterset_fields = ['title', 'active']
+    search_fields = ['title', 'storyline']
+
