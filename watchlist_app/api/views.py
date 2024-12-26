@@ -41,6 +41,14 @@ from rest_framework.throttling import ScopedRateThrottle
 #             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class UserReviewAPI(generics.ListCreateAPIView):
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        username = self.kwargs['username']
+        return Review.objects.filter(review_user__username=username)
+
+
 class PlatFormVS(viewsets.ModelViewSet):
     queryset = StreamPlatform.objects.all()
     serializer_class = StreamPlatformSerializer
