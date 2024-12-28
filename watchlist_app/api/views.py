@@ -21,6 +21,7 @@ from rest_framework.throttling import ScopedRateThrottle
 
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+from watchlist_app.api.pagination import WatchlistPagination, WatchListLimitOffsetPagination
 
 
 # class PlatFormVS(viewsets.ViewSet):
@@ -337,4 +338,5 @@ class WatchListTest(generics.ListAPIView):
     filterset_fields = ['active']
     search_fields = ['title', 'storyline', 'platform__name']
     ordering_fields = ['avg_rating', 'number_rating']
+    pagination_class = WatchListLimitOffsetPagination
 

@@ -25,6 +25,9 @@ class WatchList(models.Model):
     def __str__(self):
         return self.title
 
+    class Meta:
+        ordering = ['-id']
+
 
 class Review(models.Model):
     review_user = models.ForeignKey(User, related_name='reviews', on_delete=models.CASCADE)
