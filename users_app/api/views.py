@@ -17,10 +17,6 @@ class RegistrationAPIView(APIView):
 
         if serializer.is_valid():
             user = serializer.save()
-            print("\n\n************************ XXX **************************\n\n")
-            print(user)
-            print("ss: ", serializer)
-            print(RegistrationSerializer(user).data)
 
             data['response'] = "Successfully registered new user."
             data['username'] = user.username
