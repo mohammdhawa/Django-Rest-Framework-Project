@@ -11,7 +11,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class WatchListSerializer(serializers.ModelSerializer):
     reviews = ReviewSerializer(many=True, read_only=True)
-    platform = serializers.StringRelatedField(read_only=True)
+    # platform = serializers.StringRelatedField(read_only=True)
+    platform = serializers.PrimaryKeyRelatedField(queryset=StreamPlatform.objects.all())  # Accept platform ID
     
     class Meta:
         model = WatchList

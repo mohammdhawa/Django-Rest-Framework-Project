@@ -186,11 +186,15 @@ class WatchListAPI(APIView):
         - Returns the serialized data for the created movie with a success status.
         - If validation fails, returns error details with a bad request status.
         """
-        serializer = WatchListSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if request.user.is_superuser:
+            serializer = WatchListSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            print(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'message': "You are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
 
 class WatchListDetailAPI(APIView):
@@ -283,22 +287,31 @@ class WatchListDetailAPI(APIView):
             movie = WatchList.objects.get(id=pk)
         except WatchList.DoesNotExist:
             return Response({'message': "WatchList Not Found"}, status=status.HTTP_404_NOT_FOUND)
-        movie.delete()
-        return Response({'Message': 'WatchList deleted successfully'}, status=status.HTTP_200_OK)
+        if request.user.is_superuser:
+            movie.delete()
+            return Response({'Message': 'WatchList deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({'message': "You are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
 
 class StreamPlatformAPI(APIView):
+    permission_classes = [AdminOrReadOnly]
+
     def get(self, request):
         streamplatform = StreamPlatform.objects.all()
         serializer = StreamPlatformSerializer(streamplatform, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
-        serializer = StreamPlatformSerializer(data=request.data, context={'request': request})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if request.user.is_superuser:
+            serializer = StreamPlatformSerializer(data=request.data, context={'request': request})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            print(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'message': "You are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
 
 class StreamPlatformDetailAPI(APIView):
@@ -315,20 +328,27 @@ class StreamPlatformDetailAPI(APIView):
             streamplatform = StreamPlatform.objects.get(id=pk)
         except StreamPlatform.DoesNotExist:
             return Response({'message': "Streamplatform Not Found"}, status=status.HTTP_404_NOT_FOUND)
+
         serializer = StreamPlatformSerializer(streamplatform, data=request.data, context={'request': request})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if request.user.is_superuser:
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            print(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'message': "You are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
     def delete(self, request, pk):
         try:
             streamplatform = StreamPlatform.objects.get(id=pk)
         except StreamPlatform.DoesNotExist:
             return Response({'message': "Streamplatform Not Found"}, status=status.HTTP_404_NOT_FOUND)
-
-        streamplatform.delete()
-        return Response({'Message': 'StreamPlatform deleted successfully'}, status=status.HTTP_200_OK)
+        if request.user.is_superuser:
+            streamplatform.delete()
+            return Response({'Message': 'StreamPlatform deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({'message': "You are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
 
 class WatchListTest(generics.ListAPIView):
