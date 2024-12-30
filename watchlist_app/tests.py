@@ -180,6 +180,8 @@ class WatchListTestCase(APITestCase):
     def test_watchlist_retrieve(self):
         response = self.client.get(reverse('watchlist-detail', args=(self.watchlist.id,)))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(WatchList.objects.count(), 1)
+        self.assertEqual(WatchList.objects.first().title, "The Matrix")
 
     def test_watchlist_update(self):
         # Log in as admin
