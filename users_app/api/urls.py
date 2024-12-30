@@ -4,7 +4,7 @@ from .views import RegistrationAPIView, LogoutAPIView
 
 
 urlpatterns = [
-    path('login/', obtain_auth_token, name='login'),
+    # path('login/', obtain_auth_token, name='login'),
     path('register', RegistrationAPIView.as_view(), name='register'),
     path('logout', LogoutAPIView.as_view(), name='logout'),
 ]
