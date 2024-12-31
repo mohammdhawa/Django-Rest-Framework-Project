@@ -215,3 +215,137 @@ class WatchListTestCase(APITestCase):
 
         response = self.client.delete(reverse('watchlist-detail', args=(self.watchlist.id,)))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+class ReviewTestCase(APITestCase):
+    def setUp(self):
+        self.user1 = User.objects.create_user(username='testuser',
+                                                        email='testuser@test.com', password='testPassword123')
+        self.user2 = User.objects.create_user(username='testuser2', email='testuser2@test.com',
+                                                    password='testPassword123')
+        self.stream = StreamPlatform.objects.create(name="Netflix", about="This is an entertainment platform.",)
+        self.watchlist = WatchList.objects.create(title="The Matrix", storyline="This is a storyline",
+                                                  platform=self.stream, active=True)
+        self.review = Review.objects.create(review_user=self.user2, rating=5, description="This is a good movie",
+                                            watchlist=self.watchlist, active=True)
+
+    def test_review_create_auth(self):
+        # log in with the first user
+        login_data = {"username": "testuser", "password": "testPassword123"}
+        login_response = self.client.post(reverse('login'), login_data)
+        self.assertEqual(login_response.status_code, status.HTTP_200_OK)
+
+        # Set the access token for authenticated requests
+        access_token = login_response.data.get('access')
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access_token}')
+
+        data = {
+            "rating": 5,
+            "description": "This is a good movie",
+            "watchlist": self.watchlist,
+            "active": True
+        }
+
+        response = self.client.post(reverse('review-create', args=(self.watchlist.id,)), data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Review.objects.count(), 2)
+
+    def test_review_create_unauth(self):
+
+
+        data = {
+            "rating": 5,
+            "description": "This is a good movie",
+            "watchlist": self.watchlist,
+            "active": True
+        }
+
+        response = self.client.post(reverse('review-create', args=(self.watchlist.id,)), data)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(Review.objects.count(), 1)
+
+    def test_review_update(self):
+        # log in with the first user
+        login_data = {"username": "testuser2", "password": "testPassword123"}
+        login_response = self.client.post(reverse('login'), login_data)
+        self.assertEqual(login_response.status_code, status.HTTP_200_OK)
+
+        # Set the access token for authenticated requests
+        access_token = login_response.data.get('access')
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access_token}')
+
+        data = {
+            "rating": 4,
+            "description": "This is a good movie - updated",
+            "watchlist": self.watchlist,
+            "active": False
+        }
+
+        response = self.client.put(reverse('review-detail', args=(self.review.id,)), data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Review.objects.get(id=self.review.id).rating, 4)
+        self.assertEqual(Review.objects.get(id=self.review.id).active, False)
+
+    def test_review_create_2_with_same_user(self):
+        # log in with the first user
+        login_data = {"username": "testuser", "password": "testPassword123"}
+        login_response = self.client.post(reverse('login'), login_data)
+        self.assertEqual(login_response.status_code, status.HTTP_200_OK)
+
+        # Set the access token for authenticated requests
+        access_token = login_response.data.get('access')
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access_token}')
+
+        data = {
+            "rating": 5,
+            "description": "This is a good movie",
+            "watchlist": self.watchlist,
+            "active": True
+        }
+
+        response = self.client.post(reverse('review-create', args=(self.watchlist.id,)), data)
+        response = self.client.post(reverse('review-create', args=(self.watchlist.id,)), data)
+        self.assertNotEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_review_update_from_another_user(self):
+        # log in with the first user
+        login_data = {"username": "testuser", "password": "testPassword123"}
+        login_response = self.client.post(reverse('login'), login_data)
+        self.assertEqual(login_response.status_code, status.HTTP_200_OK)
+
+        # Set the access token for authenticated requests
+        access_token = login_response.data.get('access')
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access_token}')
+
+        data = {
+            "rating": 4,
+            "description": "This is a good movie - updated",
+            "watchlist": self.watchlist,
+            "active": False
+        }
+
+        response = self.client.put(reverse('review-detail', args=(self.review.id,)), data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_review_list(self):
+        response = self.client.get(reverse('review-list', args=(self.watchlist.id,)))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Review.objects.count(), 1)
+
+    def test_review_retrieve(self):
+        response = self.client.get(reverse('review-detail', args=(self.review.id,)))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_review_delete(self):
+        # log in with the first user
+        login_data = {"username": "testuser2", "password": "testPassword123"}
+        login_response = self.client.post(reverse('login'), login_data)
+        self.assertEqual(login_response.status_code, status.HTTP_200_OK)
+
+        # Set the access token for authenticated requests
+        access_token = login_response.data.get('access')
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access_token}')
+
+        response = self.client.delete(reverse('review-detail', args=(self.review.id,)))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Review.objects.count(), 0)

@@ -69,26 +69,35 @@ class ReviewCreateAPI(generics.CreateAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     throttle_classes = [ReviewCreateThrottle]
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        pk = self.kwargs['pk']
-        movie = WatchList.objects.get(id=pk)
+        if self.request.user:
+            pk = self.kwargs['pk']
+            movie = WatchList.objects.get(id=pk)
 
-        user = self.request.user
-        review_queryset = Review.objects.filter(review_user=user, watchlist=movie)
+            user = self.request.user
+            review_queryset = Review.objects.filter(review_user=user, watchlist=movie)
 
-        if review_queryset.exists():
-            raise ValidationError("You have already reviewed this movie")
+            if review_queryset.exists():
+                return Response({'message': "You have already reviewed this movie"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if movie.number_rating == 0:
-            movie.avg_rating = serializer.validated_data['rating']
+            if movie.number_rating == 0:
+                movie.avg_rating = serializer.validated_data['rating']
+            else:
+                movie.avg_rating = (movie.avg_rating + serializer.validated_data['rating']) / 2
+
+            movie.number_rating = movie.number_rating + 1
+            movie.save()
+
+            if serializer.is_valid():
+                serializer.save(watchlist=movie, review_user=user)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                print(serializer.errors)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            movie.avg_rating = (movie.avg_rating + serializer.validated_data['rating']) / 2
-
-        movie.number_rating = movie.number_rating + 1
-        movie.save()
-
-        serializer.save(watchlist=movie, review_user=user)
+            return Response({'message': "You are not authorized to perform this action"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class ReviewListAPI(generics.ListCreateAPIView):
