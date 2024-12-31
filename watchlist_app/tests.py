@@ -349,3 +349,8 @@ class ReviewTestCase(APITestCase):
         response = self.client.delete(reverse('review-detail', args=(self.review.id,)))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Review.objects.count(), 0)
+
+    def test_review_user(self):
+        response = self.client.get('/watch/reviews/?username=' + self.user2.username)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Review.objects.count(), 1)
